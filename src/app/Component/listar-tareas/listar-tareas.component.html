@@ -1,1 +1,133 @@
-<p>listar-tareas works!</p>
+<div class="nav">
+  <a [routerLink]="['/crear']" routerLinkActive="router-link-active">
+    <button mat-icon-button color="primary">
+      <mat-icon>note_add</mat-icon>
+      <h6>agregar tarea</h6>
+    </button>
+  </a>
+  <h1>Lista de tareas</h1>
+  <div
+    style="
+      height: 4rem;
+      width: 40rem;
+      display: flex;
+      justify-content: space-around;
+    "
+  >
+    <mat-radio-group
+      aria-label="Select an option"
+      (change)="filtrarBusqueda($event)"
+    >
+      <mat-radio-button value="Todas">Todas</mat-radio-button>
+      <mat-radio-button value="Pendientes">Pendientes</mat-radio-button>
+      <mat-radio-button value="Completadas">Completadas</mat-radio-button>
+    </mat-radio-group>
+  </div>
+</div>
+
+<div class="mat-elevation-z8">
+  <table class="tabla" mat-table [dataSource]="dataSource">
+    <ng-container matColumnDef="nombre">
+      <th mat-header-cell *matHeaderCellDef>Nombre</th>
+      <td mat-cell *matCellDef="let element">{{ element.nombre }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="fecha">
+      <th mat-header-cell *matHeaderCellDef>Fecha</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.fecha | date : "dd/MM/yyyy" }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="persona">
+      <th mat-header-cell *matHeaderCellDef>Personas</th>
+      <td mat-cell *matCellDef="let element">
+        <mat-accordion>
+          <ng-container *ngFor="let persona of element.personas">
+            <mat-expansion-panel hideToggle>
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  {{ persona.nombre }}
+                </mat-panel-title>
+                <mat-panel-description>
+                  Edad: {{ persona.edad }}
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+              <div>
+                <strong>Habilidades:</strong>
+                <button
+                  mat-icon-button
+                  color="primary"
+                  style="margin-left: 1rem"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <ul>
+                  <li *ngFor="let habilidad of persona.habilidades">
+                    {{ habilidad }}
+                  </li>
+                </ul>
+              </div>
+              <div class="cerrar">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="
+                    eliminarPersonaAsociada(persona.nombre, element.nombre)
+                  "
+                >
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </mat-expansion-panel>
+          </ng-container>
+        </mat-accordion>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="opciones">
+      <th mat-header-cell *matHeaderCellDef style="width: 20rem"></th>
+      <td mat-cell *matCellDef="let element">
+        <div class="botones">
+          <button mat-icon-button color="primary" style="margin-right: 2rem">
+            <mat-icon>person_add</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            color="warn"
+            style="margin-right: 2rem"
+            (click)="eliminarTarea(element.nombre)"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+          <ng-container *ngIf="element.completada; else incompleta">
+            <button mat-icon-button class="green">
+              <mat-icon>check_circle</mat-icon>
+            </button>
+          </ng-container>
+          <ng-template #incompleta>
+            <button
+              mat-icon-button
+              class="incomplete-icon"
+              aria-label="Mark as incomplete"
+              (click)="marcarComoCompletada(element.nombre)"
+            >
+              <mat-icon>radio_button_unchecked</mat-icon>
+            </button>
+          </ng-template>
+        </div>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+
+  <mat-paginator
+    class="piePaginator"
+    [pageSizeOptions]="[5, 8, 20]"
+    showFirstLastButtons
+    aria-label="Seleccionar pagina"
+  >
+  </mat-paginator>
+</div>
